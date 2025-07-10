@@ -66,22 +66,46 @@
         let aksesTerbuka = false;
 
         function hitung() {
-            let jam1 = document.getElementById("jam1").value;
-            let menit1 = document.getElementById("menit1").value;
-            let jam2 = document.getElementById("jam2").value;
-            let menit2 = document.getElementById("menit2").value;
-            let operasi = document.getElementById("operasi").value;
-            let hasilDiv = document.getElementById("hasil");
+    let jam1 = document.getElementById("jam1").value;
+    let menit1 = document.getElementById("menit1").value;
+    let jam2 = document.getElementById("jam2").value;
+    let menit2 = document.getElementById("menit2").value;
+    let operasi = document.getElementById("operasi").value;
+    let hasilDiv = document.getElementById("hasil");
 
-            hasilDiv.className = "result";
+    hasilDiv.className = "result";
 
-            if (aksesTerbuka) {
-                // Jika sudah VIP, kosong otomatis jadi 0
-                jam1 = parseInt(jam1) || 0;
-                menit1 = parseInt(menit1) || 0;
-                jam2 = parseInt(jam2) || 0;
-                menit2 = parseInt(menit2) || 0;
-            } else {
+    if (aksesTerbuka) {
+        // Jika sudah masuk kode VIP → otomatis kosong dianggap 0
+        jam1 = parseInt(jam1) || 0;
+        menit1 = parseInt(menit1) || 0;
+        jam2 = parseInt(jam2) || 0;
+        menit2 = parseInt(menit2) || 0;
+    } else {
+        // Sebelum VIP → Harus diisi semua (validasi manual)
+        if (jam1 === "" || menit1 === "" || jam2 === "" || menit2 === "") {
+            hasilDiv.innerHTML = 'Isi semua kolom waktu terlebih dahulu!';
+            hasilDiv.classList.add("error", "show");
+            return;
+        }
+        jam1 = parseInt(jam1);
+        menit1 = parseInt(menit1);
+        jam2 = parseInt(jam2);
+        menit2 = parseInt(menit2);
+    }
+
+    if (
+        jam1 < 0 || menit1 < 0 || menit1 > 59 ||
+        jam2 < 0 || menit2 < 0 || menit2 > 59
+    ) {
+        hasilDiv.innerHTML = 'Input tidak valid!';
+        hasilDiv.classList.add("error", "show");
+        hasilTerakhir = "";
+        return;
+    }
+
+}
+ else {
                 // Harus diisi semua sebelum VIP
                 if (jam1 === "" || menit1 === "" || jam2 === "" || menit2 === "") {
                     hasilDiv.innerHTML = 'Isi semua kolom waktu terlebih dahulu!';
