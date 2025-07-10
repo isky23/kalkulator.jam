@@ -1,12 +1,15 @@
+# Membuat file index.html dengan kolom VIP Code untuk aktivasi fitur rahasia
+html_code = """
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Kalkulator Jam Lengkap</title>
+    <title>Kalkulator Jam Super Lengkap + VIP Code</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
+            background-color: #f0f0f0;
         }
         input, select, button {
             padding: 8px;
@@ -17,23 +20,35 @@
             margin-top: 20px;
             font-weight: bold;
             font-size: 18px;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+        .result.show {
+            opacity: 1;
+        }
+        .success {
+            color: green;
         }
         .error {
             color: red;
         }
+        .vip {
+            color: blue;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h2>Kalkulator Jam Lengkap</h2>
+    <h2>Kalkulator Jam Super Lengkap + VIP Code</h2>
 
     <label>Jam 1:</label>
-    <input type="number" id="jam1" min="0" max="23" value="0">
+    <input type="number" id="jam1" min="0" value="0">
 
     <label>Menit 1:</label>
     <input type="number" id="menit1" min="0" max="59" value="0">
 
     <label>Jam 2:</label>
-    <input type="number" id="jam2" min="0" max="23" value="0">
+    <input type="number" id="jam2" min="0" value="0">
 
     <label>Menit 2:</label>
     <input type="number" id="menit2" min="0" max="59" value="0">
@@ -45,9 +60,18 @@
     </select>
 
     <button onclick="hitung()">Hitung</button>
+    <button onclick="resetForm()">Reset</button>
     <button onclick="downloadHasil()">Download Hasil</button>
 
     <div class="result" id="hasil"></div>
+
+    <hr>
+
+    <h3>Insert VIP Code:</h3>
+    <input type="password" id="vipcode" placeholder="Masukkan kode rahasia...">
+    <button onclick="cekVIP()">Submit</button>
+
+    <div class="result" id="viphasil"></div>
 
     <script>
         let hasilTerakhir = "";
@@ -58,46 +82,56 @@
             let jam2 = parseInt(document.getElementById("jam2").value);
             let menit2 = parseInt(document.getElementById("menit2").value);
             let operasi = document.getElementById("operasi").value;
-
             let hasilDiv = document.getElementById("hasil");
-
-            // Validasi input
+            
+            hasilDiv.className = "result";
+            
             if (
                 isNaN(jam1) || isNaN(menit1) || isNaN(jam2) || isNaN(menit2) ||
-                jam1 < 0 || jam1 > 23 ||
-                menit1 < 0 || menit1 > 59 ||
-                jam2 < 0 || jam2 > 23 ||
-                menit2 < 0 || menit2 > 59
+                jam1 < 0 || menit1 < 0 || menit1 > 59 ||
+                jam2 < 0 || menit2 < 0 || menit2 > 59
             ) {
-                hasilDiv.innerHTML = '<span class="error">Input tidak valid!</span>';
+                hasilDiv.innerHTML = 'Input tidak valid!';
+                hasilDiv.classList.add("error", "show");
                 hasilTerakhir = "";
                 return;
             }
 
-            let totalJam = 0;
-            let totalMenit = 0;
+            let totalJam = 0, totalMenit = 0, hari = 0;
 
             if (operasi === "tambah") {
                 totalMenit = menit1 + menit2;
                 totalJam = jam1 + jam2 + Math.floor(totalMenit / 60);
-                totalMenit = totalMenit % 60;
-                totalJam = totalJam % 24;
-            } else if (operasi === "kurang") {
+                totalMenit %= 60;
+                hari = Math.floor(totalJam / 24);
+                totalJam %= 24;
+            } else {
                 let menitTotal1 = jam1 * 60 + menit1;
                 let menitTotal2 = jam2 * 60 + menit2;
                 let selisih = menitTotal1 - menitTotal2;
-
-                if (selisih < 0) {
-                    selisih += 24 * 60;
-                }
-
-                totalJam = Math.floor(selisih / 60);
-                totalMenit = selisih % 60;
+                if (selisih < 0) selisih += 24 * 60;
+                hari = Math.floor(selisih / (24 * 60));
+                let sisaMenit = selisih % (24 * 60);
+                totalJam = Math.floor(sisaMenit / 60);
+                totalMenit = sisaMenit % 60;
             }
 
-            hasilTerakhir =
-                "Hasil: " + totalJam.toString().padStart(2, '0') + ":" + totalMenit.toString().padStart(2, '0');
+            hasilTerakhir = "Hasil: ";
+            if (hari > 0) hasilTerakhir += hari + " hari, ";
+            hasilTerakhir += totalJam.toString().padStart(2, '0') + ":" + totalMenit.toString().padStart(2, '0');
+
             hasilDiv.innerHTML = hasilTerakhir;
+            hasilDiv.classList.add("success", "show");
+        }
+
+        function resetForm() {
+            document.getElementById("jam1").value = 0;
+            document.getElementById("menit1").value = 0;
+            document.getElementById("jam2").value = 0;
+            document.getElementById("menit2").value = 0;
+            document.getElementById("hasil").innerHTML = "";
+            document.getElementById("hasil").className = "result";
+            hasilTerakhir = "";
         }
 
         function downloadHasil() {
@@ -115,6 +149,27 @@
             link.click();
             document.body.removeChild(link);
         }
+
+        function cekVIP() {
+            let kode = document.getElementById("vipcode").value;
+            let vipDiv = document.getElementById("viphasil");
+            vipDiv.className = "result";
+            if (kode === "550055") {
+                vipDiv.innerHTML = "Mode Developer Aktif! Semua fitur rahasia terbuka!";
+                vipDiv.classList.add("vip", "show");
+            } else {
+                vipDiv.innerHTML = "Kode salah atau tidak valid.";
+                vipDiv.classList.add("error", "show");
+            }
+        }
     </script>
 </body>
-</html> 
+</html>
+"""
+
+# Simpan file
+html_filename = '/mnt/data/index.html'
+with open(html_filename, 'w', encoding='utf-8') as f:
+    f.write(html_code)
+
+html_filename
