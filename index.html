@@ -76,13 +76,11 @@
             hasilDiv.className = "result";
 
             if (aksesTerbuka) {
-                // Jika sudah VIP, kosong otomatis jadi 0
                 jam1 = parseInt(jam1) || 0;
                 menit1 = parseInt(menit1) || 0;
                 jam2 = parseInt(jam2) || 0;
                 menit2 = parseInt(menit2) || 0;
             } else {
-                // Harus diisi semua sebelum VIP
                 if (jam1 === "" || menit1 === "" || jam2 === "" || menit2 === "") {
                     hasilDiv.innerHTML = 'Isi semua kolom waktu terlebih dahulu!';
                     hasilDiv.classList.add("error", "show");
@@ -187,10 +185,39 @@
             }
         }
 
-        // Fitur ENTER untuk kolom VIP Code
+        // VIP Code Enter
         document.getElementById("vipcode").addEventListener("keydown", function(event) {
             if (event.key === "Enter") {
                 cekVIP();
+            }
+        });
+
+        // Enter otomatis pindah kolom atau hitung otomatis
+        document.getElementById("pukul").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                document.getElementById("menit").focus();
+            }
+        });
+
+        document.getElementById("menit").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                document.getElementById("jamS").focus();
+            }
+        });
+
+        document.getElementById("jamS").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                document.getElementById("menitS").focus();
+            }
+        });
+
+        document.getElementById("menitS").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                hitung();
             }
         });
     </script>
