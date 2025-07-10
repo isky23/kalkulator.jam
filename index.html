@@ -34,20 +34,20 @@
     <h2>Kalkulator Jam + VIP Lock System</h2>
 
     <label>Jam 1:</label>
-    <input type="number" id="jam1" disabled>
+    <input type="number" id="jam1">
     <label>Menit 1:</label>
-    <input type="number" id="menit1" disabled>
+    <input type="number" id="menit1">
     <label>Jam 2:</label>
-    <input type="number" id="jam2" disabled>
+    <input type="number" id="jam2">
     <label>Menit 2:</label>
-    <input type="number" id="menit2" disabled>
+    <input type="number" id="menit2">
     <label>Operasi:</label>
-    <select id="operasi" disabled>
+    <select id="operasi">
         <option value="tambah">Tambah</option>
         <option value="kurang">Kurang</option>
     </select>
 
-    <button id="btnHitung" onclick="hitung()" disabled>Hitung</button>
+    <button id="btnHitung" onclick="hitung()">Hitung</button>
     <button id="btnReset" onclick="resetForm()" disabled>Reset</button>
     <button id="btnDownload" onclick="downloadHasil()" disabled>Download Hasil</button>
 
@@ -112,16 +112,24 @@
         }
 
         function resetForm() {
-            document.getElementById("jam1").value = 0;
-            document.getElementById("menit1").value = 0;
-            document.getElementById("jam2").value = 0;
-            document.getElementById("menit2").value = 0;
+            if (!aksesTerbuka) {
+                alert("Anda harus memasukkan kode developer!");
+                return;
+            }
+            document.getElementById("jam1").value = "";
+            document.getElementById("menit1").value = "";
+            document.getElementById("jam2").value = "";
+            document.getElementById("menit2").value = "";
             document.getElementById("hasil").innerHTML = "";
             document.getElementById("hasil").className = "result";
             hasilTerakhir = "";
         }
 
         function downloadHasil() {
+            if (!aksesTerbuka) {
+                alert("Anda harus memasukkan kode developer!");
+                return;
+            }
             if (hasilTerakhir === "") {
                 alert("Belum ada hasil untuk didownload!");
                 return;
@@ -146,12 +154,9 @@
                 vipDiv.innerHTML = "Mode Developer Aktif! Semua fitur terbuka.";
                 vipDiv.classList.add("vip", "show");
 
-                // Aktifkan semua fitur
-                ['jam1','menit1','jam2','menit2','operasi','btnHitung','btnReset','btnDownload'].forEach(id => {
-                    document.getElementById(id).disabled = false;
-                });
+                document.getElementById("btnReset").disabled = false;
+                document.getElementById("btnDownload").disabled = false;
 
-                // Hilangkan VIP code section perlahan
                 let vipSection = document.getElementById("vipSection");
                 vipSection.classList.add("fade-out");
                 setTimeout(() => {
@@ -162,14 +167,6 @@
                 vipDiv.classList.add("error", "show");
             }
         }
-
-        // BONUS: Deteksi klik tombol Reset sebelum kode VIP dimasukkan
-        document.getElementById("btnReset").addEventListener("click", function(e) {
-            if (!aksesTerbuka) {
-                e.preventDefault();
-                alert("Anda harus memasukkan kode developer!");
-            }
-        }, true);
     </script>
 </body>
 </html>
