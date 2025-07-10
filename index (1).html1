@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Kalkulator Jam Lengkap</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        input, select, button {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h2>Kalkulator Jam Lengkap</h2>
+
+    <label>Jam 1:</label>
+    <input type="number" id="jam1" min="0" max="23" value="0">
+
+    <label>Menit 1:</label>
+    <input type="number" id="menit1" min="0" max="59" value="0">
+
+    <label>Jam 2:</label>
+    <input type="number" id="jam2" min="0" max="23" value="0">
+
+    <label>Menit 2:</label>
+    <input type="number" id="menit2" min="0" max="59" value="0">
+
+    <label>Operasi:</label>
+    <select id="operasi">
+        <option value="tambah">Tambah</option>
+        <option value="kurang">Kurang</option>
+    </select>
+
+    <button onclick="hitung()">Hitung</button>
+    <button onclick="downloadHasil()">Download Hasil</button>
+
+    <div class="result" id="hasil"></div>
+
+    <script>
+        let hasilTerakhir = "";
+
+        function hitung() {
+            let jam1 = parseInt(document.getElementById("jam1").value);
+            let menit1 = parseInt(document.getElementById("menit1").value);
+            let jam2 = parseInt(document.getElementById("jam2").value);
+            let menit2 = parseInt(document.getElementById("menit2").value);
+            let operasi = document.getElementById("operasi").value;
+
+            let hasilDiv = document.getElementById("hasil");
+
+            // Validasi input
+            if (
+                isNaN(jam1) || isNaN(menit1) || isNaN(jam2) || isNaN(menit2) ||
+                jam1 < 0 || jam1 > 23 ||
+                menit1 < 0 || menit1 > 59 ||
+                jam2 < 0 || jam2 > 23 ||
+                menit2 < 0 || menit2 > 59
+            ) {
+                hasilDiv.innerHTML = '<span class="error">Input tidak valid!</span>';
+                hasilTerakhir = "";
+                return;
+            }
+
+            let totalJam = 0;
+            let totalMenit = 0;
+
+            if (operasi === "tambah") {
+                totalMenit = menit1 + menit2;
+                totalJam = jam1 + jam2 + Math.floor(totalMenit / 60);
+                totalMenit = totalMenit % 60;
+                totalJam = totalJam % 24;
+            } else if (operasi === "kurang") {
+                let menitTotal1 = jam1 * 60 + menit1;
+                let menitTotal2 = jam2 * 60 + menit2;
+                let selisih = menitTotal1 - menitTotal2;
+
+                if (selisih < 0) {
+                    selisih += 24 * 60;
+                }
+
+                totalJam = Math.floor(selisih / 60);
+                totalMenit = selisih % 60;
+            }
+
+            hasilTerakhir =
+                "Hasil: " + totalJam.toString().padStart(2, '0') + ":" + totalMenit.toString().padStart(2, '0');
+            hasilDiv.innerHTML = hasilTerakhir;
+        }
+
+        function downloadHasil() {
+            if (hasilTerakhir === "") {
+                alert("Belum ada hasil untuk didownload!");
+                return;
+            }
+
+            let blob = new Blob([hasilTerakhir], { type: "text/plain" });
+            let url = URL.createObjectURL(blob);
+            let link = document.createElement("a");
+            link.href = url;
+            link.download = "hasil_kalkulator_jam.txt";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
