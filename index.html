@@ -1,10 +1,8 @@
-# Membuat file index.html dengan kolom VIP Code untuk aktivasi fitur rahasia
-html_code = """
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Kalkulator Jam Super Lengkap + VIP Code</title>
+    <title>Kalkulator Jam + VIP Lock System</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,55 +24,46 @@ html_code = """
         .result.show {
             opacity: 1;
         }
-        .success {
-            color: green;
-        }
-        .error {
-            color: red;
-        }
-        .vip {
-            color: blue;
-            font-weight: bold;
-        }
+        .success { color: green; }
+        .error { color: red; }
+        .vip { color: blue; font-weight: bold; }
+        .fade-out { opacity: 0; transition: opacity 1s ease; }
     </style>
 </head>
 <body>
-    <h2>Kalkulator Jam Super Lengkap + VIP Code</h2>
+    <h2>Kalkulator Jam + VIP Lock System</h2>
 
     <label>Jam 1:</label>
-    <input type="number" id="jam1" min="0" value="0">
-
+    <input type="number" id="jam1" disabled>
     <label>Menit 1:</label>
-    <input type="number" id="menit1" min="0" max="59" value="0">
-
+    <input type="number" id="menit1" disabled>
     <label>Jam 2:</label>
-    <input type="number" id="jam2" min="0" value="0">
-
+    <input type="number" id="jam2" disabled>
     <label>Menit 2:</label>
-    <input type="number" id="menit2" min="0" max="59" value="0">
-
+    <input type="number" id="menit2" disabled>
     <label>Operasi:</label>
-    <select id="operasi">
+    <select id="operasi" disabled>
         <option value="tambah">Tambah</option>
         <option value="kurang">Kurang</option>
     </select>
 
-    <button onclick="hitung()">Hitung</button>
-    <button onclick="resetForm()">Reset</button>
-    <button onclick="downloadHasil()">Download Hasil</button>
+    <button id="btnHitung" onclick="hitung()" disabled>Hitung</button>
+    <button id="btnReset" onclick="resetForm()" disabled>Reset</button>
+    <button id="btnDownload" onclick="downloadHasil()" disabled>Download Hasil</button>
 
     <div class="result" id="hasil"></div>
 
     <hr>
-
-    <h3>Insert VIP Code:</h3>
-    <input type="password" id="vipcode" placeholder="Masukkan kode rahasia...">
-    <button onclick="cekVIP()">Submit</button>
-
-    <div class="result" id="viphasil"></div>
+    <div id="vipSection">
+        <h3>Insert VIP Code:</h3>
+        <input type="password" id="vipcode" placeholder="Masukkan kode rahasia...">
+        <button id="btnVipSubmit" onclick="cekVIP()">Submit</button>
+        <div class="result" id="viphasil"></div>
+    </div>
 
     <script>
         let hasilTerakhir = "";
+        let aksesTerbuka = false;
 
         function hitung() {
             let jam1 = parseInt(document.getElementById("jam1").value);
@@ -83,9 +72,8 @@ html_code = """
             let menit2 = parseInt(document.getElementById("menit2").value);
             let operasi = document.getElementById("operasi").value;
             let hasilDiv = document.getElementById("hasil");
-            
+
             hasilDiv.className = "result";
-            
             if (
                 isNaN(jam1) || isNaN(menit1) || isNaN(jam2) || isNaN(menit2) ||
                 jam1 < 0 || menit1 < 0 || menit1 > 59 ||
@@ -98,7 +86,6 @@ html_code = """
             }
 
             let totalJam = 0, totalMenit = 0, hari = 0;
-
             if (operasi === "tambah") {
                 totalMenit = menit1 + menit2;
                 totalJam = jam1 + jam2 + Math.floor(totalMenit / 60);
@@ -139,7 +126,6 @@ html_code = """
                 alert("Belum ada hasil untuk didownload!");
                 return;
             }
-
             let blob = new Blob([hasilTerakhir], { type: "text/plain" });
             let url = URL.createObjectURL(blob);
             let link = document.createElement("a");
@@ -151,25 +137,39 @@ html_code = """
         }
 
         function cekVIP() {
+            if (aksesTerbuka) return;
             let kode = document.getElementById("vipcode").value;
             let vipDiv = document.getElementById("viphasil");
             vipDiv.className = "result";
             if (kode === "550055") {
-                vipDiv.innerHTML = "Mode Developer Aktif! Semua fitur rahasia terbuka!";
+                aksesTerbuka = true;
+                vipDiv.innerHTML = "Mode Developer Aktif! Semua fitur terbuka.";
                 vipDiv.classList.add("vip", "show");
+
+                // Aktifkan semua fitur
+                ['jam1','menit1','jam2','menit2','operasi','btnHitung','btnReset','btnDownload'].forEach(id => {
+                    document.getElementById(id).disabled = false;
+                });
+
+                // Hilangkan VIP code section perlahan
+                let vipSection = document.getElementById("vipSection");
+                vipSection.classList.add("fade-out");
+                setTimeout(() => {
+                    vipSection.style.display = "none";
+                }, 1000);
             } else {
                 vipDiv.innerHTML = "Kode salah atau tidak valid.";
                 vipDiv.classList.add("error", "show");
             }
         }
+
+        // BONUS: Deteksi klik tombol Reset sebelum kode VIP dimasukkan
+        document.getElementById("btnReset").addEventListener("click", function(e) {
+            if (!aksesTerbuka) {
+                e.preventDefault();
+                alert("Anda harus memasukkan kode developer!");
+            }
+        }, true);
     </script>
 </body>
 </html>
-"""
-
-# Simpan file
-html_filename = '/mnt/data/index.html'
-with open(html_filename, 'w', encoding='utf-8') as f:
-    f.write(html_code)
-
-html_filename
