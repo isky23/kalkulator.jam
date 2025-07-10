@@ -57,7 +57,12 @@
     <div id="vipSection">
         <h3>Insert VIP Code:</h3>
         <input type="password" id="vipcode" placeholder="Masukkan kode rahasia...">
-        <button id="btnVipSubmit" onclick="cekVIP()">Submit</button>
+<button id="btnVipSubmit" onclick="cekVIP()">Submit</button>
+        document.getElementById("vipcode").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        cekVIP();
+    }
+});
         <div class="result" id="viphasil"></div>
     </div>
 
